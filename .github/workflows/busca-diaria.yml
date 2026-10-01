@@ -1,9 +1,12 @@
 name: Busca diária Smiles
 
+# Agendamento desligado: a Smiles bloqueia os servidores do GitHub, então a
+# busca diária roda no computador de casa (veja o README). Para religar,
+# descomente as duas linhas de "schedule".
 on:
-  schedule:
-    - cron: "17 10 * * *"   # todo dia às 07:17 (horário de Brasília)
-  workflow_dispatch:         # permite rodar manualmente pela aba Actions
+  # schedule:
+  #   - cron: "17 10 * * *"   # todo dia às 07:17 (horário de Brasília)
+  workflow_dispatch:           # permite rodar manualmente pela aba Actions
 
 permissions:
   contents: write            # para salvar o histórico em dados/

@@ -470,6 +470,20 @@ def notificar(texto: str, assunto: str, anexo: Path | None = None):
 # ---------------------------------------------------------------- principal
 
 
+def carregar_env(caminho: Path):
+    """Lê variáveis no formato NOME=valor de um arquivo .env, sem sobrescrever as já definidas."""
+    if not caminho.exists():
+        return
+    for linha in caminho.read_text(encoding="utf-8-sig").splitlines():
+        linha = linha.strip()
+        if not linha or linha.startswith("#") or "=" not in linha:
+            continue
+        nome, valor = linha.split("=", 1)
+        valor = valor.strip().strip('"').strip("'")
+        if valor:
+            os.environ.setdefault(nome.strip(), valor)
+
+
 def executar(cfg: dict, notificar_ao_fim: bool = True) -> int:
     hoje = date.today()
     consultas = gerar_consultas(cfg, hoje)
@@ -539,6 +553,7 @@ def main():
     parser.add_argument("--sem-notificar", action="store_true", help="não envia Telegram/e-mail")
     parser.add_argument("--testar-notificacao", action="store_true", help="envia uma mensagem de teste e sai")
     args = parser.parse_args()
+    carregar_env(RAIZ / ".env")
 
     if args.testar_notificacao:
         notificar("✅ Teste do buscador Smiles: notificações funcionando!", "Buscador Smiles: teste")

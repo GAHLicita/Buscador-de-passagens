@@ -80,3 +80,16 @@ def test_mensagem():
     texto = buscador.montar_mensagem([_oferta(72000)], 1, 10)
     assert "72.000 milhas — GRU→LIS em 10/01/2027" in texto
     assert "direto" in texto
+
+
+def test_carregar_env(tmp_path, monkeypatch):
+    arquivo = tmp_path / ".env"
+    arquivo.write_text('# comentário\nSMTP_USUARIO="eu@exemplo.com"\nSMTP_SENHA=abcd efgh\nVAZIO=\nJA_DEFINIDA=nova\n')
+    for nome in ("SMTP_USUARIO", "SMTP_SENHA", "VAZIO"):
+        monkeypatch.delenv(nome, raising=False)
+    monkeypatch.setenv("JA_DEFINIDA", "antiga")
+    buscador.carregar_env(arquivo)
+    assert buscador.os.environ["SMTP_USUARIO"] == "eu@exemplo.com"
+    assert buscador.os.environ["SMTP_SENHA"] == "abcd efgh"
+    assert "VAZIO" not in buscador.os.environ
+    assert buscador.os.environ["JA_DEFINIDA"] == "antiga"

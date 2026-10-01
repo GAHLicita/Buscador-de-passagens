@@ -1,11 +1,11 @@
 # Buscador de passagens Smiles ✈️ 🇪🇺
 
-Procura todos os dias passagens **em milhas Smiles** do Brasil para a Europa
-(e, se você quiser, as voltas também). Quando encontra trechos dentro do seu
-limite de milhas, avisa por **Telegram** e/ou **e-mail**.
+Procura todos os dias passagens **em milhas Smiles** de São Paulo (GRU) para França,
+Luxemburgo, Alemanha, Bélgica, Holanda e Suíça, com as voltas também. Todo dia manda
+um **e-mail** com o que encontrou dentro do seu limite de milhas.
 
 - Configure rotas, datas e limite de milhas em [`config.yaml`](config.yaml).
-- Por padrão você só recebe ofertas **novas** ou que **ficaram mais baratas** desde a última busca.
+- O e-mail traz todas as ofertas do dia. Para receber só as novas ou as que ficaram mais baratas, use `so_novidades: true`.
 - Cada execução salva um CSV em `dados/resultados/AAAA-MM-DD.csv`.
 
 > As milhas mostradas são por adulto e por trecho. **Taxas de embarque não estão incluídas.**
@@ -28,53 +28,64 @@ Abra o `config.yaml` e ajuste:
 Total de buscas = origens × destinos × datas (× 2 com a volta). Mantenha esse número
 na casa das centenas. Muitas buscas seguidas fazem a Smiles bloquear o acesso.
 
-## 2. Configurar os avisos
+## 2. Instalar no seu computador
 
-### Telegram (recomendado)
-1. No Telegram, fale com **@BotFather**, envie `/newbot` e guarde o **token**.
-2. Mande qualquer mensagem para o seu bot novo.
-3. Fale com **@userinfobot** para descobrir o seu **chat id**.
+A busca roda no seu computador porque a Smiles bloqueia servidores na nuvem, como o
+GitHub. O computador precisa estar ligado e com internet no horário da busca
+(07:17). Se estiver desligado, a busca roda assim que você ligar no Windows, ou quando
+o Mac acordar.
 
-### E-mail (Gmail)
-1. Ative a verificação em duas etapas na sua conta Google.
-2. Crie uma **senha de app** em <https://myaccount.google.com/apppasswords>.
-3. Use seu e-mail como `SMTP_USUARIO` e a senha de app como `SMTP_SENHA`.
-   Para outro provedor, defina também `SMTP_HOST` e `SMTP_PORTA` (SSL).
+Antes de tudo, instale o **Python 3** em <https://www.python.org/downloads/>.
+No Windows, marque a opção **"Add python.exe to PATH"** na instalação.
 
-## 3. Rodar todo dia
+Depois baixe este projeto: no GitHub, clique em **Code → Download ZIP** e descompacte
+numa pasta fixa, por exemplo `C:\buscador-de-passagens` ou `~/buscador-de-passagens`.
+No Mac, evite as pastas Documentos, Mesa e Downloads, porque o agendador do sistema
+não tem permissão de acessá-las.
 
-### Opção A: no seu computador (mais confiável)
-A Smiles costuma bloquear servidores na nuvem, mas aceita a internet de casa.
+### Windows
+1. Dê dois cliques em **`instalar_windows.bat`**. Ele instala tudo e cria a tarefa
+   "Buscador Smiles" no Agendador de Tarefas.
+2. O Bloco de Notas abre o arquivo `.env`. Preencha o e-mail e a senha de app (veja o passo 3) e salve.
+3. Dê dois cliques em **`testar_email_windows.bat`** para conferir se o e-mail chega.
+4. Para fazer uma busca agora, dê dois cliques em **`rodar_windows.bat`**.
+   O andamento fica no arquivo `busca.log`.
 
+Para desligar a busca diária, abra o **Agendador de Tarefas**, encontre "Buscador Smiles"
+e escolha **Desabilitar** ou **Excluir**.
+
+### Mac ou Linux
+No Terminal, dentro da pasta do projeto:
 ```bash
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python -m playwright install chromium
-
-export TELEGRAM_BOT_TOKEN="..."    # Windows: set TELEGRAM_BOT_TOKEN=...
-export TELEGRAM_CHAT_ID="..."
-python buscador.py --testar-notificacao   # confere se o aviso chega
-python buscador.py                        # faz a busca
+bash instalar.sh
 ```
+Depois preencha o `.env` e teste:
+```bash
+.venv/bin/python buscador.py --testar-notificacao   # e-mail de teste
+.venv/bin/python buscador.py                        # busca agora
+```
+Para desligar: no Mac, `launchctl unload ~/Library/LaunchAgents/br.buscador-smiles.plist`.
+No Linux, `crontab -e` e apague a linha `# buscador-smiles`.
 
-Para agendar a execução diária:
-- **Linux/Mac (cron)**: `crontab -e` e adicione
-  `0 7 * * * cd /caminho/Buscador-de-passagens && .venv/bin/python buscador.py >> busca.log 2>&1`
-  (coloque as variáveis `TELEGRAM_...` no topo do crontab).
-- **Windows**: no *Agendador de Tarefas*, crie uma tarefa diária que execute
-  `C:\caminho\Buscador-de-passagens\.venv\Scripts\python.exe buscador.py`
-  com "Iniciar em" apontando para a pasta do projeto.
+## 3. Configurar o e-mail (Gmail)
 
-### Opção B: GitHub Actions (grátis, sem deixar o PC ligado)
-O workflow [`busca-diaria.yml`](.github/workflows/busca-diaria.yml) roda todo dia às 07:17
-(horário de Brasília) e salva o histórico em `dados/`.
+1. Ative a **verificação em duas etapas** na sua conta Google.
+2. Crie uma **senha de app** em <https://myaccount.google.com/apppasswords>.
+   O Google mostra 16 letras.
+3. No arquivo `.env` da pasta do projeto, preencha:
+   ```
+   SMTP_USUARIO=seu.email@gmail.com
+   SMTP_SENHA=as16letrasdasenhadeapp
+   ```
+   `EMAIL_PARA` é opcional. Vazio, o e-mail vai para você mesmo.
+   O `.env` fica só no seu computador e nunca é enviado ao GitHub.
 
-1. Em **Settings → Secrets and variables → Actions**, cadastre os secrets
-   `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID` e/ou `SMTP_USUARIO`, `SMTP_SENHA` e `EMAIL_PARA`.
-2. Em **Actions → Busca diária Smiles → Run workflow**, rode uma vez para testar.
-3. Se a Smiles bloquear os servidores do GitHub, você recebe um aviso de falha.
-   Nesse caso use a Opção A.
+Você recebe um e-mail por dia com as passagens encontradas e a planilha anexada.
+Se quiser avisos também pelo Telegram, preencha `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`.
+Crie o bot com **@BotFather** e descubra o chat id com **@userinfobot**.
+
+> O workflow do GitHub Actions continua no repositório, mas **sem agendamento**.
+> Só roda se você mandar manualmente, e a Smiles bloqueia os servidores do GitHub.
 
 ## Como funciona
 
