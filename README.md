@@ -54,18 +54,39 @@ não tem permissão de acessá-las.
 Para desligar a busca diária, abra o **Agendador de Tarefas**, encontre "Buscador Smiles"
 e escolha **Desabilitar** ou **Excluir**.
 
-### Mac ou Linux
-No Terminal, dentro da pasta do projeto:
+### Linux
+No Terminal:
 ```bash
+sudo apt install python3 python3-venv git     # Ubuntu/Debian/Mint (só na 1ª vez)
+git clone https://github.com/GAHLicita/Buscador-de-passagens.git ~/buscador-de-passagens
+cd ~/buscador-de-passagens
 bash instalar.sh
 ```
-Depois preencha o `.env` e teste:
+O instalador cria um **timer do systemd** que roda todo dia às 07:17. Se o PC estiver
+desligado nesse horário, a busca roda assim que você ligar e entrar na sua conta. Sem
+systemd, o instalador usa o `cron`.
+
+Depois preencha o `.env` (veja o passo 3) e teste:
 ```bash
+nano .env                                           # coloque e-mail e senha de app
 .venv/bin/python buscador.py --testar-notificacao   # e-mail de teste
 .venv/bin/python buscador.py                        # busca agora
+tail -f busca.log                                   # acompanha as buscas agendadas
 ```
-Para desligar: no Mac, `launchctl unload ~/Library/LaunchAgents/br.buscador-smiles.plist`.
-No Linux, `crontab -e` e apague a linha `# buscador-smiles`.
+
+Comandos úteis:
+```bash
+systemctl --user list-timers buscador-smiles.timer    # próxima execução
+systemctl --user start buscador-smiles.service        # roda agora, em segundo plano
+systemctl --user disable --now buscador-smiles.timer  # desliga a busca diária
+git pull && bash instalar.sh                          # atualiza o buscador
+```
+Se o instalador disser que o Chromium não abriu, rode o comando `sudo ... install-deps`
+que ele mostrar.
+
+### Mac
+Rode `bash instalar.sh` no Terminal, dentro da pasta. O agendamento usa o launchd.
+Para desligar: `launchctl unload ~/Library/LaunchAgents/br.buscador-smiles.plist`.
 
 ## 3. Configurar o e-mail (Gmail)
 

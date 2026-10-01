@@ -486,6 +486,7 @@ def carregar_env(caminho: Path):
 
 def executar(cfg: dict, notificar_ao_fim: bool = True) -> int:
     hoje = date.today()
+    print(f"===== Busca de {datetime.now():%d/%m/%Y %H:%M} =====")
     consultas = gerar_consultas(cfg, hoje)
     print(f"{len(consultas)} buscas a fazer.")
     cliente = ClienteSmiles(
