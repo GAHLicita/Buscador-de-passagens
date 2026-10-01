@@ -53,6 +53,8 @@ CABECALHOS_API = {
     ),
 }
 
+MAX_ERROS_SEGUIDOS = 5
+
 TARIFAS_SO_MILHAS = {False: ("SMILES",), True: ("SMILES_CLUB", "SMILES")}
 
 
@@ -479,20 +481,25 @@ def executar(cfg: dict, notificar_ao_fim: bool = True) -> int:
     )
     pausa = float(cfg.get("pausa_entre_buscas_seg", 4))
     todas: list[Oferta] = []
-    falhas = 0
+    sucessos = 0
+    erros_seguidos = 0
     try:
         for i, c in enumerate(consultas, 1):
             print(f"[{i}/{len(consultas)}] {c.sentido} {c.origem}-{c.destino} {c.data}")
             try:
                 resposta = cliente.buscar(c.origem, c.destino, c.data)
                 todas += extrair_ofertas(resposta, c, bool(cfg.get("clube_smiles")))
+                sucessos += 1
+                erros_seguidos = 0
             except BloqueadoError as e:
                 print(f"Bloqueado pela Smiles ({e}). Interrompendo.", file=sys.stderr)
-                falhas = len(consultas) - i + 1
                 break
             except Exception as e:
-                falhas += 1
+                erros_seguidos += 1
                 print(f"  erro: {e}", file=sys.stderr)
+                if erros_seguidos >= MAX_ERROS_SEGUIDOS:
+                    print(f"{erros_seguidos} erros seguidos. Interrompendo.", file=sys.stderr)
+                    break
             time.sleep(pausa + random.uniform(0, pausa / 2))
     finally:
         cliente.fechar()
@@ -500,7 +507,7 @@ def executar(cfg: dict, notificar_ao_fim: bool = True) -> int:
     if not consultas:
         print("Nenhuma busca gerada; confira origens, destinos e datas no config.yaml.", file=sys.stderr)
         return 1
-    if falhas == len(consultas):
+    if sucessos == 0:
         print("Nenhuma busca funcionou; estado anterior mantido.", file=sys.stderr)
         if notificar_ao_fim:
             notificar(
