@@ -8,16 +8,23 @@ origens:
 
 # Aeroportos na Europa que você aceita como destino.
 destinos:
-  - LIS   # Lisboa
-  - OPO   # Porto
-  - MAD   # Madri
-  - BCN   # Barcelona
-  - CDG   # Paris
-  - FCO   # Roma
-  # - MXP # Milão
-  # - AMS # Amsterdã
-  # - FRA # Frankfurt
-  # - LHR # Londres
+  # França
+  - CDG   # Paris - Charles de Gaulle
+  - ORY   # Paris - Orly
+  - LYS   # Lyon
+  - NCE   # Nice
+  # Luxemburgo
+  - LUX   # Luxemburgo
+  # Alemanha
+  - FRA   # Frankfurt
+  - MUC   # Munique
+  - BER   # Berlim
+  - DUS   # Düsseldorf
+  # Bélgica
+  - BRU   # Bruxelas
+  # Arredores
+  - AMS   # Amsterdã (Holanda)
+  - ZRH   # Zurique (Suíça)
 
 # Janela de datas de ida. Use datas fixas (AAAA-MM-DD) OU dias a partir de hoje.
 datas:
@@ -28,7 +35,7 @@ datas:
   intervalo_dias: 7           # pesquisa uma data a cada 7 dias (menos requisições)
 
 # Atenção: nº de buscas = origens x destinos x datas (x2 se buscar a volta).
-# Com os valores acima: 1 x 6 x 13 x 2 = 156 buscas (~15 min por dia).
+# Com os valores acima: 1 x 12 x 13 x 2 = 312 buscas (~30-40 min por dia).
 
 # Busca também a volta (Europa -> Brasil)? Se sim, a volta é pesquisada
 # com as mesmas datas deslocadas pela duração da viagem.
@@ -53,5 +60,5 @@ pausa_entre_buscas_seg: 4
 
 # Notificações (as credenciais ficam em variáveis de ambiente / secrets, nunca aqui)
 notificacao:
-  so_novidades: true    # avisa só ofertas novas ou que ficaram mais baratas
+  so_novidades: false   # true = avisa só ofertas novas ou que ficaram mais baratas
   max_itens: 15

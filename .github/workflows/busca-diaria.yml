@@ -38,6 +38,14 @@ jobs:
           EMAIL_PARA: ${{ secrets.EMAIL_PARA }}
         run: python buscador.py
 
+      - name: Guardar planilha da busca
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-smiles
+          path: dados/
+          if-no-files-found: ignore
+
       - name: Salvar histórico no repositório
         if: always()
         run: |

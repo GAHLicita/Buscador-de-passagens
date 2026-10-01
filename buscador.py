@@ -392,7 +392,7 @@ def salvar_csv(ofertas: list[Oferta], hoje: date) -> Path:
 
 def montar_mensagem(ofertas: list[Oferta], total: int, max_itens: int) -> str:
     if not ofertas:
-        return "✈️ Buscador Smiles: nenhuma oferta nova dentro do limite hoje."
+        return "✈️ Buscador Smiles: nenhuma oferta nova dentro do limite de milhas hoje."
     linhas = [f"✈️ Buscador Smiles: {total} oferta(s) para a Europa\n"]
     for sentido in ("ida", "volta"):
         do_sentido = [o for o in ofertas if o.sentido == sentido][:max_itens]
@@ -425,7 +425,7 @@ def enviar_telegram(texto: str) -> bool:
         return r.status == 200
 
 
-def enviar_email(assunto: str, texto: str) -> bool:
+def enviar_email(assunto: str, texto: str, anexo: Path | None = None) -> bool:
     usuario = os.environ.get("SMTP_USUARIO")
     senha = os.environ.get("SMTP_SENHA")
     para = os.environ.get("EMAIL_PARA") or usuario
@@ -436,6 +436,8 @@ def enviar_email(assunto: str, texto: str) -> bool:
     msg["From"] = usuario
     msg["To"] = para
     msg.set_content(texto)
+    if anexo and anexo.exists():
+        msg.add_attachment(anexo.read_bytes(), maintype="text", subtype="csv", filename=anexo.name)
     host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     porta = int(os.environ.get("SMTP_PORTA", "465"))
     with smtplib.SMTP_SSL(host, porta, timeout=30) as smtp:
@@ -444,9 +446,13 @@ def enviar_email(assunto: str, texto: str) -> bool:
     return True
 
 
-def notificar(texto: str, assunto: str):
+def notificar(texto: str, assunto: str, anexo: Path | None = None):
     enviados = []
-    for nome, envio in (("Telegram", lambda: enviar_telegram(texto)), ("e-mail", lambda: enviar_email(assunto, texto))):
+    canais = (
+        ("Telegram", lambda: enviar_telegram(texto)),
+        ("e-mail", lambda: enviar_email(assunto, texto, anexo)),
+    )
+    for nome, envio in canais:
         try:
             if envio():
                 enviados.append(nome)
@@ -516,7 +522,7 @@ def executar(cfg: dict, notificar_ao_fim: bool = True) -> int:
     texto = montar_mensagem(a_avisar, len(a_avisar), int(cfg_notif.get("max_itens", 15)))
     print("\n" + texto)
     if notificar_ao_fim and (a_avisar or not cfg_notif.get("so_novidades", True)):
-        notificar(texto, f"Smiles: {len(a_avisar)} passagem(ns) para a Europa em milhas")
+        notificar(texto, f"Smiles: {len(a_avisar)} passagem(ns) para a Europa em milhas", caminho)
     return 0
 
 
