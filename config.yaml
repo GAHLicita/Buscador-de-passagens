@@ -1,0 +1,57 @@
+# Configuração do buscador de passagens com milhas Smiles.
+# Edite este arquivo para mudar as rotas, datas e o limite de milhas.
+
+# Aeroportos de saída (códigos IATA).
+origens:
+  - GRU   # São Paulo - Guarulhos
+  # - GIG # Rio de Janeiro - Galeão
+
+# Aeroportos na Europa que você aceita como destino.
+destinos:
+  - LIS   # Lisboa
+  - OPO   # Porto
+  - MAD   # Madri
+  - BCN   # Barcelona
+  - CDG   # Paris
+  - FCO   # Roma
+  # - MXP # Milão
+  # - AMS # Amsterdã
+  # - FRA # Frankfurt
+  # - LHR # Londres
+
+# Janela de datas de ida. Use datas fixas (AAAA-MM-DD) OU dias a partir de hoje.
+datas:
+  # inicio: 2027-01-10
+  # fim: 2027-02-28
+  dias_a_partir_de_hoje: 30   # começa a buscar daqui a 30 dias
+  janela_dias: 90             # ... e vai até 90 dias depois disso
+  intervalo_dias: 7           # pesquisa uma data a cada 7 dias (menos requisições)
+
+# Atenção: nº de buscas = origens x destinos x datas (x2 se buscar a volta).
+# Com os valores acima: 1 x 6 x 13 x 2 = 156 buscas (~15 min por dia).
+
+# Busca também a volta (Europa -> Brasil)? Se sim, a volta é pesquisada
+# com as mesmas datas deslocadas pela duração da viagem.
+volta:
+  ativa: true
+  duracao_viagem_dias: 15
+
+# Filtros
+cabine: ECONOMIC        # ECONOMIC, PREMIUM_ECONOMIC, BUSINESS, FIRST ou all
+adultos: 1
+max_milhas: 90000       # só avisa trechos de até este valor (por adulto, por trecho)
+max_paradas: 2          # 0 = só voos diretos
+clube_smiles: false     # true usa o preço de assinante do Clube Smiles
+companhias: []          # ex.: [TP, AF, KL]; vazio = qualquer companhia
+
+# Como buscar:
+#   api       -> chama a API da Smiles direto (rápido)
+#   navegador -> abre o site num Chrome automatizado (mais lento, passa melhor por bloqueios)
+#   auto      -> tenta a API e cai para o navegador se for bloqueado
+modo: auto
+pausa_entre_buscas_seg: 4
+
+# Notificações (as credenciais ficam em variáveis de ambiente / secrets, nunca aqui)
+notificacao:
+  so_novidades: true    # avisa só ofertas novas ou que ficaram mais baratas
+  max_itens: 15

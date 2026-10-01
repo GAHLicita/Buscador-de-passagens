@@ -1,0 +1,52 @@
+{
+  "requestedFlightSegmentList": [
+    {
+      "type": "SEGMENT_1",
+      "flightList": [
+        {
+          "uid": "voo-1",
+          "stops": 0,
+          "cabin": "ECONOMIC",
+          "departure": {"date": "2026-11-20T21:40:00", "airport": {"code": "GRU"}},
+          "arrival": {"date": "2026-11-21T12:10:00", "airport": {"code": "LIS"}},
+          "airline": {"code": "TP", "name": "TAP Air Portugal"},
+          "duration": {"hours": 10, "minutes": 30},
+          "legList": [{"flightNumber": "88", "marketingAirline": {"code": "TP"}}],
+          "fareList": [
+            {"type": "SMILES", "miles": 95000, "money": 0},
+            {"type": "SMILES_CLUB", "miles": 85500, "money": 0},
+            {"type": "SMILES_MONEY", "miles": 40000, "money": 1200.5}
+          ]
+        },
+        {
+          "uid": "voo-2",
+          "stops": 1,
+          "cabin": "ECONOMIC",
+          "departure": {"date": "2026-11-20T18:00:00", "airport": {"code": "GRU"}},
+          "arrival": {"date": "2026-11-21T15:30:00", "airport": {"code": "LIS"}},
+          "airline": {"code": "AF", "name": "Air France"},
+          "duration": {"hours": 17, "minutes": 5},
+          "legList": [
+            {"flightNumber": "457", "marketingAirline": {"code": "AF"}},
+            {"flightNumber": "1124", "marketingAirline": {"code": "AF"}}
+          ],
+          "fareList": [
+            {"type": "SMILES", "miles": 72000, "money": 0},
+            {"type": "SMILES_CLUB", "miles": 64800, "money": 0}
+          ]
+        },
+        {
+          "uid": "voo-3",
+          "stops": 0,
+          "cabin": "BUSINESS",
+          "departure": {"date": "2026-11-20T22:00:00", "airport": {"code": "GRU"}},
+          "arrival": {"date": "2026-11-21T13:00:00", "airport": {"code": "LIS"}},
+          "airline": {"code": "TP", "name": "TAP Air Portugal"},
+          "duration": {"hours": 11, "minutes": 0},
+          "legList": [{"flightNumber": "82", "marketingAirline": {"code": "TP"}}],
+          "fareList": [{"type": "SMILES", "miles": 250000, "money": 0}]
+        }
+      ]
+    }
+  ]
+}
